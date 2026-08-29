@@ -16,7 +16,17 @@ MonoBehaviour:
   - name: Merchant
     speaker: 3
     sentences:
-    - Hello and welcome!
+    - Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
+      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
+      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
+      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
+      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
+      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
+      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
+      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
+      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
+      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
+      welcome!
     - Get over here and buy your stuff
     - They're for a good price ;)
   - name: Player

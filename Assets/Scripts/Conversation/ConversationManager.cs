@@ -6,7 +6,18 @@ public class ConversationManager : MonoBehaviour
 {
     [SerializeField] private TMPro.TextMeshProUGUI speakerText, conversationText;
 
+    private event System.Func<bool> Condition = () => InputManager.Input.Conversation.Next.triggered;
+
+    [SerializeField, Range(0.001f, 0.1f)] private float typeSpeed;
+    private WaitForSeconds delay;
+    private WaitUntil condition;
     private bool isBusy;
+
+    void Awake()
+    {
+        delay = new(typeSpeed);
+        condition = new(Condition);
+    }
 
     private void PrepareConversation(Conversation conversation)
     {
@@ -16,20 +27,9 @@ public class ConversationManager : MonoBehaviour
     }
     private IEnumerator StartConversation(Conversation conversation)
     {
-        if (isBusy)
-        {
-            Debug.LogWarning("Conversation manager is busy");
-            yield break;
-        }
-        if (speakerText == null || conversationText == null)
-        {
-            Debug.LogError("Null references");
-            yield break;
-        }
+        if (isBusy || speakerText == null || conversationText == null) yield break;
 
         isBusy = true;
-
-        Debug.Log("Starting conversation");
 
         foreach (Conversation.ConversationData conversationData in conversation.conversations)
         {
@@ -39,10 +39,15 @@ public class ConversationManager : MonoBehaviour
 
             foreach (string sentence in conversationData.sentences)
             {
+                conversationText.maxVisibleCharacters = 0;
                 conversationText.text = sentence;
+                for (int i = 0; i < sentence.Length; i++)
+                {
+                    conversationText.maxVisibleCharacters++;
+                    yield return delay;
+                }
 
-                yield return new WaitUntil(() => InputManager.Input.Conversation.Next.triggered);
-                yield return null;
+                yield return condition; yield return null;
             }
         }
 
