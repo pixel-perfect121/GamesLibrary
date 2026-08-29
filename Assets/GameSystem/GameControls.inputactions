@@ -640,6 +640,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Conversation",
+            "id": "3206fece-9b90-4f08-a6e2-4cb926e2f2e5",
+            "actions": [
+                {
+                    "name": "Next",
+                    "type": "Button",
+                    "id": "618dd8b6-9783-466d-bdae-c09b09cc3d4e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Skip",
+                    "type": "Button",
+                    "id": "873f5730-8cc2-4310-9725-9ba8fb2ca763",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "40367e5d-2d55-416d-8b20-0a8b051a563a",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1a463648-2be0-47d1-8933-4d471f7bd5d1",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Skip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
