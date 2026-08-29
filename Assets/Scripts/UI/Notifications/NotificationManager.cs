@@ -2,23 +2,38 @@ using UnityEngine;
 
 public class NotificationManager : MonoBehaviour
 {
-    [SerializeField] private GameObject container;
     [SerializeField] private TMPro.TextMeshProUGUI titleText, descriptionText, deliveryTimeText;
 
-    private void Notify(Notification notification) // Null checks later
+    private Animator animator;
+    private readonly int AnimateHash = Animator.StringToHash("Animate");
+
+    private readonly System.Collections.Generic.Queue<Notification> queue = new();
+    private bool isBusy;
+
+    void Awake() { animator = GetComponent<Animator>(); }
+
+    private void Notify(Notification notification)
     {
-        titleText.text = notification.title;
-        descriptionText.text = notification.description;
-        deliveryTimeText.text = notification.deliveryTime;
+        if (isBusy) { queue.Enqueue(notification); return; }
 
-        StartCoroutine(ShowNotification());
+        isBusy = true;
 
-        System.Collections.IEnumerator ShowNotification()
+        if (titleText != null) titleText.text = notification.title;
+        if (descriptionText != null) descriptionText.text = notification.description;
+        if (deliveryTimeText != null) deliveryTimeText.text = notification.deliveryTime;
+
+        if (animator != null)
         {
-            container.SetActive(true);
-            yield return new WaitForSeconds(3f);
-            container.SetActive(false);
+            animator.ResetTrigger(AnimateHash);
+            animator.SetTrigger(AnimateHash);
         }
+    }
+
+    public void Finished()
+    {
+        isBusy = false;
+
+        if (queue.Count != 0) Notify(queue.Dequeue());
     }
 
     void OnEnable() { Notification.Created += Notify; }
