@@ -9,6 +9,7 @@ public class ConversationManager : MonoBehaviour
 
     private readonly System.Func<bool> Condition = () => InputManager.Input.Conversation.Next.triggered;
     private WaitForSeconds typeSpeedDelay; private WaitUntil condition; private bool isBusy;
+    // Maybe use a Queue<Conversation> to handle multiple queues, Enqueue when isBusy = true
 
     void Awake() { typeSpeedDelay = new(typeSpeed); condition = new(Condition); }
 

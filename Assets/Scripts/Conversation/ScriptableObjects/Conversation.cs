@@ -59,6 +59,11 @@ public class Conversation : ScriptableObject
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Start Conversation"))
             {
+                if (!UnityEditor.EditorApplication.isPlaying)
+                {
+                    Debug.LogWarning("Cannot start conversation while not playing");
+                    return;
+                }
                 if (Conversation.HasStarted)
                 {
                     Debug.LogWarning($"Conversation named <b>{Conversation.name}</b> has already started");
