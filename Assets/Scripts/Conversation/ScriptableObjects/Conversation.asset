@@ -12,33 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c793412afb570f479cbd8d4b7eeb80f, type: 3}
   m_Name: Conversation
   m_EditorClassIdentifier: 
-  conversations:
+  <Conversations>k__BackingField:
   - name: Merchant
-    speaker: 3
-    sentences:
-    - Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
-      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
-      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
-      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
-      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
-      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
-      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
-      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
-      welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello
-      and welcome!Hello and welcome!Hello and welcome!Hello and welcome!Hello and
-      welcome!
-    - Get over here and buy your stuff
+    <Speaker>k__BackingField: 3
+    <Sentences>k__BackingField:
+    - Hello and Welcome!
+    - Come get your stuff in here
     - They're for a good price ;)
   - name: Player
-    speaker: 1
-    sentences:
-    - Do you sell meat?
+    <Speaker>k__BackingField: 1
+    <Sentences>k__BackingField:
+    - Do you have any meat?
+    - I need to replenish my energy
   - name: RandomNPC
-    speaker: 4
-    sentences:
+    <Speaker>k__BackingField: 4
+    <Sentences>k__BackingField:
     - No. He's a weak vegan
-    - Lmao he also sold nothing
+    - Also he sells nothing LOL
   - name: Player
-    speaker: 1
-    sentences:
-    - LMAOOOO
+    <Speaker>k__BackingField: 1
+    <Sentences>k__BackingField:
+    - LMAO
+  hasStarted: 0

@@ -853,7 +853,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speakerText: {fileID: 268375944}
   conversationText: {fileID: 1643430943}
-  typeSpeed: 0.0216
+  typeSpeed: 0.0165
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
