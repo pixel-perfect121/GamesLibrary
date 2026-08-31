@@ -1,7 +1,6 @@
 [System.Serializable]
 public struct GameInfo
 {
-    public readonly string ID => $"game_info_{name.ToLower().Replace(" ", "_")}";
     public readonly string name;
     public string description;
     public int rating;
@@ -15,6 +14,8 @@ public struct GameInfo
 
         Created?.Invoke(this);
     }
+
+    public readonly string GetID() => $"{name.ToLower().Replace(" ", "_")}_game";
 
     public void ModifyDescription(string newDescription)
     {

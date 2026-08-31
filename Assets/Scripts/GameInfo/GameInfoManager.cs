@@ -1,18 +1,14 @@
 using UnityEngine;
-using System.Text.Json;
 using System.Collections.Generic;
 
 public class GameInfoManager : MonoBehaviour
 {
-    private readonly Dictionary<string, GameInfo> gameInfos = new();
+    private readonly Dictionary<string, GameInfo> gamesDictionary = new();
 
     private void OnGameInfoCreated(GameInfo gameInfo)
     {
-        Debug.Log($"Name: {gameInfo.name}, Description: {gameInfo.description}, Rating: {gameInfo.rating}");
-        gameInfos.Add(gameInfo.ID, gameInfo);
-
-        string json = JsonSerializer.Serialize(gameInfos, new JsonSerializerOptions() { IncludeFields = true, WriteIndented = true });
-        System.IO.File.WriteAllText(System.IO.Path.Combine(Application.persistentDataPath, "GameInfo.json"), json);
+        gamesDictionary.Add(gameInfo.GetID(), gameInfo);
+        Debug.Log($"Name: {gameInfo.name}, Description: {gameInfo.description}, Rating: {gameInfo.rating}, \nID: {gameInfo.GetID()}");
     }
     private void OnGameInfoModified(GameInfo gameInfo)
     {
