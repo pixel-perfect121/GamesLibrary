@@ -684,34 +684,6 @@ namespace _AudioManager
             return true;
         }
 
-        #region Get&Set volume
-        //public static void SetMasterVolume(float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(MASTERVOLUME, Mathf.Log10(audioLevel) * 20f);
-        //}
-        //public static void SetMusicVolume(float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(MUSICVOLUME, Mathf.Log10(audioLevel) * 20f);
-        //}
-        //public static void SetSFXVolume(float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(SFXVOLUME, Mathf.Log10(audioLevel) * 20f);
-        //}
-
-        //public static void SetVolume(string mixerName, float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(mixerName, Mathf.Log10(audioLevel) * 20f);
-        //}
-        #endregion
-
         public static void Register(AudioBook book)
         {
             if (audioDictionary.ContainsKey(book.soundType)) return;
@@ -945,20 +917,6 @@ namespace _UIManager
 
 namespace _Inheritance
 {
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
-    {
-        [SerializeField] private bool persistInScenes = true;
-        public static T Instance { get; private set; }
-
-        protected virtual void Awake()
-        {
-            if (Instance != null) { Destroy(gameObject); return; }
-
-            Instance = this as T;
-            if (persistInScenes) DontDestroyOnLoad(gameObject);
-        }
-    }
-
     public class StateMachine<T>
     {
         public State<T> CurrentState { get; private set; }
