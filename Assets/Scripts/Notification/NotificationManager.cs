@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NotificationManager : MonoBehaviour
+public sealed class NotificationManager : MonoBehaviour
 {
     [SerializeField] private TMPro.TextMeshProUGUI titleText, descriptionText;
 
