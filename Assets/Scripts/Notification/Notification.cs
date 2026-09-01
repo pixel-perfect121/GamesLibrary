@@ -1,7 +1,6 @@
 ﻿using System;
 
-/// <summary>Game-wide notification system.</summary>
-/// <remarks>Useful for spamming FIX BEDROCK MOJANG 🗿.</remarks>
+/// <summary>Game-wide notifying system.</summary>
 public readonly struct Notification
 {
     /// <summary>Title of subject or name of sender.</summary>
@@ -17,11 +16,10 @@ public readonly struct Notification
     /// <summary>Create and invoke Created event.</summary>
     /// <param name="title">Title of subject or name of sender.</param>
     /// <param name="description">Extra information.</param>
-    /// <param name="priority">How important is this notification.</param>
     public Notification(string title, string description)
     {
         this.title = title; this.description = description;
-        creationTime = DateTime.Now;
+        creationTime = DateTime.UtcNow;
 
         Created?.Invoke(this);
     }
