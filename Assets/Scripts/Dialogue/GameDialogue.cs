@@ -11,7 +11,7 @@ public class GameDialogue : ScriptableObject
     public string GetDialogue(DialogueType dialogueType)
     {
         if (dialogues == null || dialogues.Length == 0) return string.Empty;
-        if (dialogueDictionary.TryGetValue(dialogueType, out Dialogue dialogue) || dialogue == null) return string.Empty;
+        if (!dialogueDictionary.TryGetValue(dialogueType, out Dialogue dialogue) || dialogue == null) return string.Empty;
 
         return dialogue.GetDialogue();
     }
