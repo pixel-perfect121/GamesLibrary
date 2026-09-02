@@ -280,7 +280,7 @@ namespace _SaveManager
     [System.Serializable]
     public class GameData
     {
-        
+        public Dictionary<string, GameInfo> GameInfoDictionary { get; set; } = new();
     }
     #endregion
 }

@@ -2,7 +2,8 @@
     "name": "Assembly-GameSystem",
     "rootNamespace": "",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:1c610f52d3aaeb646b8b9a7f6fe04fc2"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

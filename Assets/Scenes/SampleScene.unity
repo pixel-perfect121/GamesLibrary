@@ -416,7 +416,7 @@ GameObject:
   - component: {fileID: 56384025}
   - component: {fileID: 56384024}
   m_Layer: 5
-  m_Name: Description
+  m_Name: DescriptionText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5668,7 +5668,7 @@ GameObject:
   - component: {fileID: 1179558080}
   - component: {fileID: 1179558079}
   m_Layer: 5
-  m_Name: Title
+  m_Name: TitleText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8654,6 +8654,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1875959240}
+  - component: {fileID: 1875959241}
   m_Layer: 5
   m_Name: GameInfoView
   m_TagString: Untagged
@@ -8684,6 +8685,20 @@ RectTransform:
   m_AnchoredPosition: {x: -500, y: 0}
   m_SizeDelta: {x: 850, y: 620}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1875959241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875959239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8067c0e346b0f8e4bb4af231a73ab7e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  titleText: {fileID: 1179558079}
+  descriptionText: {fileID: 56384024}
 --- !u!1 &1922735900
 GameObject:
   m_ObjectHideFlags: 0

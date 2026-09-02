@@ -2,7 +2,10 @@
     "name": "Assembly-GameInfo",
     "rootNamespace": "",
     "references": [
-        "GUID:ce4b46e3ff1e94242883f5bbbc3285c9"
+        "GUID:ce4b46e3ff1e94242883f5bbbc3285c9",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:8301ee766821bf246ae6d117e92f39a0",
+        "GUID:1c610f52d3aaeb646b8b9a7f6fe04fc2"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
