@@ -1,5 +1,7 @@
 using UnityEngine;
+using System.Collections.Generic;
 using _SaveManager;
+using System.Linq;
 
 public static class GameInfoManager
 {
@@ -10,14 +12,17 @@ public static class GameInfoManager
         GameInfo.Modified += OnGameInfoModified;
     }
 
+    public static IReadOnlyList<GameInfo> RequestGameInfos() => SaveManager.GameData.GameInfoDictionary.Values.ToList();
+
     private static void OnGameInfoCreated(GameInfo gameInfo)
     {
-        if (!SaveManager.GameData.GameInfoDictionary.TryAdd(gameInfo.GetID(), gameInfo))
+        if (SaveManager.GameData.GameInfoDictionary.ContainsKey(gameInfo.GetID()))
         {
             new Notification("Game already exists", $"{gameInfo.Title} already exists in the database");
             return;
         }
 
+        SaveManager.GameData.GameInfoDictionary.Add(gameInfo.GetID(), gameInfo);
         SaveManager.RequestSave(Method.Async);
 
         new Notification("Game added", $"{gameInfo.Title} has been added");
@@ -26,7 +31,7 @@ public static class GameInfoManager
     {
         if (!SaveManager.GameData.GameInfoDictionary.ContainsKey(gameInfo.GetID()))
         {
-            new Notification("Game does not exist", "The given ID doesn't correspond to any game");
+            new Notification("Game does not exist", "The given ID does not correspond to any game");
             return;
         }
 

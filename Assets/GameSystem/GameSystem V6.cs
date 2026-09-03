@@ -20,8 +20,7 @@ namespace _SaveManager
 
         private static readonly JsonSerializerOptions saveOptions = new()
         {
-            IncludeFields = true,
-            WriteIndented = true,
+            IncludeFields = true, WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             Converters = { new Vector2Converter(), new Vector3Converter(), new ColorConverter() }
         };

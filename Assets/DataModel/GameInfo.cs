@@ -8,7 +8,7 @@ public enum Modification { Description, Rating, Both }
 public struct GameInfo
 {
     /// <summary>Name or title of the game.</summary>
-    public readonly string Title { get; }
+    public string Title { get; private set; }
     /// <summary>Extra information about the game.</summary>
     public string Description { get; private set; }
     /// <summary>How much you liked the game.</summary>
@@ -20,13 +20,13 @@ public struct GameInfo
     /// <summary>Fires when using any modify method.</summary>
     public static event Action<GameInfo, Modification> Modified;
 
-    /// <summary>Create and invoke Created event.</summary>
-    /// <param name="name">Name or title of the game.</param>
+    /// <summary>Create and invoke the Created event.</summary>
+    /// <param name="title">Name or title of the game.</param>
     /// <param name="description">Extra information about the game.</param>
     /// <param name="rating">How much you liked the game.</param>
-    public GameInfo(string name, string description, int rating)
+    public GameInfo(string title, string description, int rating)
     {
-        Title = name; Description = description; Rating = rating;
+        Title = title; Description = description; Rating = rating;
         Created?.Invoke(this);
     }
 
