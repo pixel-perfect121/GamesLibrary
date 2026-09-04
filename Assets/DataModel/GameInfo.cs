@@ -1,11 +1,11 @@
 ﻿using System;
 
-/// <summary>Type of modification done.</summary>
+/// <summary>Type of modification done to the <see cref="GameInfo"/> object.</summary>
 public enum Modification { Description, Rating, Both }
 
 /// <summary>Struct holding information about a given game.</summary>
 [Serializable]
-public struct GameInfo
+public class GameInfo
 {
     /// <summary>Name or title of the game.</summary>
     public string Title { get; private set; }
@@ -20,15 +20,16 @@ public struct GameInfo
     /// <summary>Fires when using any modify method.</summary>
     public static event Action<GameInfo, Modification> Modified;
 
-    /// <summary>Create and invoke the Created event.</summary>
     /// <param name="title">Name or title of the game.</param>
     /// <param name="description">Extra information about the game.</param>
     /// <param name="rating">How much you liked the game.</param>
     public GameInfo(string title, string description, int rating)
     {
         Title = title; Description = description; Rating = rating;
-        Created?.Invoke(this);
     }
+    /// <summary>Invoke the Create event.</summary>
+    /// <returns>returns a copy of the object that invoked the event.</returns>
+    public GameInfo Create() { Created?.Invoke(this); return this; }
 
     /// <summary>Change description and invoke Modified event.</summary>
     public void Modify(string newDescription)
@@ -51,5 +52,5 @@ public struct GameInfo
 
     /// <summary>Gives a string associated with the object.</summary>
     /// <returns>returns an ID for the game, formatted as lower_case_game</returns>
-    public readonly string GetID() => $"{Title.ToLowerInvariant().Replace(" ", "_")}_game";
+    public string GetID() => $"{Title.ToLowerInvariant().Replace(" ", "_")}_game";
 }

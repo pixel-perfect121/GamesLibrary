@@ -7,8 +7,10 @@ public class GameInfoDisplayView : MonoBehaviour
 
     private void OnGameInfoDisplayed(GameInfo gameInfo)
     {
-        titleText.text = gameInfo.Title;
-        descriptionText.text = gameInfo.Description;
+        if (gameInfo == null) return;
+
+        if (titleText != null)titleText.text = gameInfo.Title;
+        if (descriptionText != null)descriptionText.text = gameInfo.Description;
     }
 
     void OnEnable() { GameInfoButton.Clicked += OnGameInfoDisplayed; }

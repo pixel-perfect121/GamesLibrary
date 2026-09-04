@@ -948,8 +948,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7db214e411d4e754ca8748bf30b3f467, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameInfoButton: {fileID: 8188548622988446655, guid: 0b82e07c1eec1254f9bccc83763cfd0f, type: 3}
-  parent: {fileID: 696557612}
+  gameInfoPrefab: {fileID: 4998577477287821047, guid: 0b82e07c1eec1254f9bccc83763cfd0f, type: 3}
+  gameInfoParent: {fileID: 696557612}
 --- !u!1 &998521353
 GameObject:
   m_ObjectHideFlags: 0

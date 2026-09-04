@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 [RequireComponent(typeof(Button))]
-public class GameInfoButton : MonoBehaviour, IPointerDownHandler
+public class GameInfoButton : MonoBehaviour, IPointerClickHandler
 {
     private Button button;
     private TextMeshProUGUI text;
@@ -25,5 +25,5 @@ public class GameInfoButton : MonoBehaviour, IPointerDownHandler
         text.text = gameInfo.Title;
     }
 
-    public void OnPointerDown(PointerEventData eventData) => Clicked?.Invoke(gameInfo);
+    public void OnPointerClick(PointerEventData eventData) => Clicked?.Invoke(gameInfo);
 }
