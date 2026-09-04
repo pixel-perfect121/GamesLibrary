@@ -20,16 +20,15 @@ public class GameInfo
     /// <summary>Fires when using any modify method.</summary>
     public static event Action<GameInfo, Modification> Modified;
 
+    /// <summary>Create and invoke the Created event.</summary>
     /// <param name="title">Name or title of the game.</param>
     /// <param name="description">Extra information about the game.</param>
     /// <param name="rating">How much you liked the game.</param>
     public GameInfo(string title, string description, int rating)
     {
         Title = title; Description = description; Rating = rating;
+        Created?.Invoke(this);
     }
-    /// <summary>Invoke the Create event.</summary>
-    /// <returns>returns a copy of the object that invoked the event.</returns>
-    public GameInfo Create() { Created?.Invoke(this); return this; }
 
     /// <summary>Change description and invoke Modified event.</summary>
     public void Modify(string newDescription)
