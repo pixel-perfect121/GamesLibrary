@@ -688,6 +688,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "WhyNot",
+            "id": "4fbbb39d-8c20-461f-b429-3e9d540ff261",
+            "actions": [
+                {
+                    "name": "Destroy",
+                    "type": "Button",
+                    "id": "24adc499-1453-441d-a33f-737e19af82ad",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "e3e50c0d-302c-4f3e-9436-c2c2b6d73dc3",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Destroy",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

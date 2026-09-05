@@ -774,6 +774,34 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""WhyNot"",
+            ""id"": ""4fbbb39d-8c20-461f-b429-3e9d540ff261"",
+            ""actions"": [
+                {
+                    ""name"": ""Destroy"",
+                    ""type"": ""Button"",
+                    ""id"": ""24adc499-1453-441d-a33f-737e19af82ad"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""e3e50c0d-302c-4f3e-9436-c2c2b6d73dc3"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Destroy"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -799,6 +827,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         m_Conversation = asset.FindActionMap("Conversation", throwIfNotFound: true);
         m_Conversation_Next = m_Conversation.FindAction("Next", throwIfNotFound: true);
         m_Conversation_Skip = m_Conversation.FindAction("Skip", throwIfNotFound: true);
+        // WhyNot
+        m_WhyNot = asset.FindActionMap("WhyNot", throwIfNotFound: true);
+        m_WhyNot_Destroy = m_WhyNot.FindAction("Destroy", throwIfNotFound: true);
     }
 
     ~@GameControls()
@@ -806,6 +837,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, GameControls.Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, GameControls.UI.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Conversation.enabled, "This will cause a leak and performance issues, GameControls.Conversation.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_WhyNot.enabled, "This will cause a leak and performance issues, GameControls.WhyNot.Disable() has not been called.");
     }
 
     /// <summary>
@@ -1297,6 +1329,102 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="ConversationActions" /> instance referencing this action map.
     /// </summary>
     public ConversationActions @Conversation => new ConversationActions(this);
+
+    // WhyNot
+    private readonly InputActionMap m_WhyNot;
+    private List<IWhyNotActions> m_WhyNotActionsCallbackInterfaces = new List<IWhyNotActions>();
+    private readonly InputAction m_WhyNot_Destroy;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "WhyNot".
+    /// </summary>
+    public struct WhyNotActions
+    {
+        private @GameControls m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public WhyNotActions(@GameControls wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "WhyNot/Destroy".
+        /// </summary>
+        public InputAction @Destroy => m_Wrapper.m_WhyNot_Destroy;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_WhyNot; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="WhyNotActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(WhyNotActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="WhyNotActions" />
+        public void AddCallbacks(IWhyNotActions instance)
+        {
+            if (instance == null || m_Wrapper.m_WhyNotActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_WhyNotActionsCallbackInterfaces.Add(instance);
+            @Destroy.started += instance.OnDestroy;
+            @Destroy.performed += instance.OnDestroy;
+            @Destroy.canceled += instance.OnDestroy;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="WhyNotActions" />
+        private void UnregisterCallbacks(IWhyNotActions instance)
+        {
+            @Destroy.started -= instance.OnDestroy;
+            @Destroy.performed -= instance.OnDestroy;
+            @Destroy.canceled -= instance.OnDestroy;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="WhyNotActions.UnregisterCallbacks(IWhyNotActions)" />.
+        /// </summary>
+        /// <seealso cref="WhyNotActions.UnregisterCallbacks(IWhyNotActions)" />
+        public void RemoveCallbacks(IWhyNotActions instance)
+        {
+            if (m_Wrapper.m_WhyNotActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="WhyNotActions.AddCallbacks(IWhyNotActions)" />
+        /// <seealso cref="WhyNotActions.RemoveCallbacks(IWhyNotActions)" />
+        /// <seealso cref="WhyNotActions.UnregisterCallbacks(IWhyNotActions)" />
+        public void SetCallbacks(IWhyNotActions instance)
+        {
+            foreach (var item in m_Wrapper.m_WhyNotActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_WhyNotActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="WhyNotActions" /> instance referencing this action map.
+    /// </summary>
+    public WhyNotActions @WhyNot => new WhyNotActions(this);
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Player" which allows adding and removing callbacks.
     /// </summary>
@@ -1425,5 +1553,20 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSkip(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "WhyNot" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="WhyNotActions.AddCallbacks(IWhyNotActions)" />
+    /// <seealso cref="WhyNotActions.RemoveCallbacks(IWhyNotActions)" />
+    public interface IWhyNotActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Destroy" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDestroy(InputAction.CallbackContext context);
     }
 }
