@@ -2,18 +2,36 @@ using UnityEngine;
 
 public class HighlightManager : MonoBehaviour
 {
-    [SerializeField] private UnityEngine.UI.Image image;
+    [SerializeField] private UnityEngine.UI.Image highlightImage, selectionImage;
     [SerializeField] private Vector2 sizeOffset;
 
     private void OnHighlighted(RectTransform rect, bool isHighlighted)
     {
-        if (image == null) return;
+        if (highlightImage == null) return;
 
-        image.rectTransform.sizeDelta = rect.rect.size + sizeOffset;
-        image.rectTransform.position = rect.position;
-        image.gameObject.SetActive(isHighlighted);
+        highlightImage.rectTransform.sizeDelta = rect.rect.size + sizeOffset;
+        highlightImage.rectTransform.position = rect.position;
+
+        highlightImage.gameObject.SetActive(isHighlighted);
+    }
+    private void OnSelected(RectTransform rect)
+    {
+        if (selectionImage == null) return;
+
+        selectionImage.rectTransform.sizeDelta = rect.rect.size + sizeOffset;
+        selectionImage.rectTransform.position = rect.position;
+
+        selectionImage.gameObject.SetActive(true);
     }
 
-    void OnEnable() { HighlightTrigger.Highlighted += OnHighlighted; }
-    void OnDisable() { HighlightTrigger.Highlighted -= OnHighlighted; }
+    void OnEnable()
+    {
+        HighlightTrigger.Highlighted += OnHighlighted;
+        HighlightTrigger.Selected += OnSelected;
+    }
+    void OnDisable()
+    {
+        HighlightTrigger.Highlighted -= OnHighlighted;
+        HighlightTrigger.Selected -= OnSelected;
+    }
 }
