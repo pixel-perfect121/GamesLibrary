@@ -40,8 +40,9 @@ public class HighlightManager : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < 1f)
         {
-            rect.position = Vector2.Lerp(startPosition, targetPosition, curve.Evaluate(elapsed));
-            rect.sizeDelta = Vector2.Lerp(startSize, targetSize, curve.Evaluate(elapsed));
+            float evaluatedTime = curve.Evaluate(elapsed);
+            rect.position = Vector2.Lerp(startPosition, targetPosition, evaluatedTime);
+            rect.sizeDelta = Vector2.Lerp(startSize, targetSize, evaluatedTime);
 
             elapsed += Time.deltaTime / animationDuration;
             yield return null;
