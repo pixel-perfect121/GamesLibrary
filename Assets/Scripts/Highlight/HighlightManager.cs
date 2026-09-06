@@ -1,27 +1,52 @@
 using UnityEngine;
+using System.Collections;
 
 public class HighlightManager : MonoBehaviour
 {
-    [SerializeField] private UnityEngine.UI.Image highlightImage, selectionImage;
+    [Header("Transforms")]
+    [SerializeField] private RectTransform highlightRect;
+    [SerializeField] private RectTransform selectionRect;
+
+    [Header("Animation settings")]
     [SerializeField] private Vector2 sizeOffset;
+    [SerializeField, Range(0.01f, 2.25f)] private float animationDuration;
+    [SerializeField] private AnimationCurve curve;
+
+    private Coroutine highlightRoutine, selectionRoutine;
 
     private void OnHighlighted(RectTransform rect, bool isHighlighted)
     {
-        if (highlightImage == null) return;
+        if (highlightRect == null) return;
 
-        highlightImage.rectTransform.sizeDelta = rect.rect.size + sizeOffset;
-        highlightImage.rectTransform.position = rect.position;
+        highlightRect.gameObject.SetActive(isHighlighted);
 
-        highlightImage.gameObject.SetActive(isHighlighted);
+        if (highlightRoutine != null) StopCoroutine(highlightRoutine);
+        highlightRoutine = StartCoroutine(SmoothMove(highlightRect, rect.position, rect.rect.size + sizeOffset));
     }
     private void OnSelected(RectTransform rect)
     {
-        if (selectionImage == null) return;
+        if (selectionRect == null) return;
 
-        selectionImage.rectTransform.sizeDelta = rect.rect.size + sizeOffset;
-        selectionImage.rectTransform.position = rect.position;
+        selectionRect.gameObject.SetActive(true);
 
-        selectionImage.gameObject.SetActive(true);
+        if (selectionRoutine != null) StopCoroutine(selectionRoutine);
+        selectionRoutine = StartCoroutine(SmoothMove(selectionRect, rect.position, rect.rect.size + sizeOffset));
+    }
+
+    private IEnumerator SmoothMove(RectTransform rect, Vector2 targetPosition, Vector2 targetSize)
+    {
+        Vector2 startPosition = rect.position, startSize = rect.sizeDelta;
+
+        float elapsed = 0f;
+        while (elapsed < 1f)
+        {
+            rect.position = Vector2.Lerp(startPosition, targetPosition, curve.Evaluate(elapsed));
+            rect.sizeDelta = Vector2.Lerp(startSize, targetSize, curve.Evaluate(elapsed));
+
+            elapsed += Time.deltaTime / animationDuration;
+            yield return null;
+        }
+        rect.position = targetPosition; rect.sizeDelta = targetSize;
     }
 
     void OnEnable()
