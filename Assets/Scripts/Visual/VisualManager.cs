@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class VisualManager : MonoBehaviour
+public sealed class VisualManager : MonoBehaviour
 {
     [Header("Image transforms")]
     [SerializeField] private RectTransform highlightRect;
@@ -17,8 +17,6 @@ public class VisualManager : MonoBehaviour
     {
         if (highlightRect == null) return;
 
-        highlightRect.position = rect.position;
-        highlightRect.sizeDelta = rect.rect.size;
         highlightRect.gameObject.SetActive(isHighlighted);
 
         if (highlightRoutine != null) StopCoroutine(highlightRoutine);
@@ -28,8 +26,6 @@ public class VisualManager : MonoBehaviour
     {
         if (clickRect == null) return;
 
-        clickRect.position = rect.position;
-        clickRect.sizeDelta = rect.rect.size;
         clickRect.gameObject.SetActive(true);
 
         if (clickRoutine != null) StopCoroutine(clickRoutine);
@@ -44,8 +40,8 @@ public class VisualManager : MonoBehaviour
         while (elapsed <= 1f)
         {
             float evaluatedTime = curve.Evaluate(elapsed);
-            rect.position = Vector2.Lerp(startPosition, targetPosition, evaluatedTime);
-            rect.sizeDelta = Vector2.Lerp(startSize, targetSize, evaluatedTime);
+            rect.position = Vector2.LerpUnclamped(startPosition, targetPosition, evaluatedTime);
+            rect.sizeDelta = Vector2.LerpUnclamped(startSize, targetSize, evaluatedTime);
 
             elapsed += Time.deltaTime / animationDuration;
             yield return null;
@@ -57,11 +53,11 @@ public class VisualManager : MonoBehaviour
     void OnEnable()
     {
         VisualTrigger.Highlighted += OnHighlighted;
-        VisualTrigger.Clicked += OnClicked;
+        VisualTrigger.Selected += OnClicked;
     }
     void OnDisable()
     {
         VisualTrigger.Highlighted -= OnHighlighted;
-        VisualTrigger.Clicked -= OnClicked;
+        VisualTrigger.Selected -= OnClicked;
     }
 }
