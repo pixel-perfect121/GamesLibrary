@@ -738,7 +738,7 @@ namespace _AudioManager
 
 namespace _UIManager
 {
-    public enum PanelType { }
+    public enum PanelType { MainMenu, AddGameInfo, GameInfo, }
 
     public static class UIManager
     {
@@ -764,13 +764,18 @@ namespace _UIManager
             currentPanel = mainMenuPanel;
         }
 
-        public static void Switch(PanelType nextPanel, CanvasGroup fadePanel, System.Action OnStart = null, System.Action OnComplete = null)
+        public static void Switch(PanelType nextPanel, CanvasGroup fadePanel = null, System.Action OnStart = null, System.Action OnComplete = null)
         {
             if (!Available(nextPanel, out Panel current, out Panel next)) return;
 
             isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
+            if (fadePanel != null)
+            {
+                fadePanel.gameObject.SetActive(true);
+                fadePanel.blocksRaycasts = true;
+            }
+
             OnStart?.Invoke();
 
             foreach (var pairs in panelDictionary) pairs.Value?.canvasGroup.gameObject.SetActive(false);
@@ -782,7 +787,11 @@ namespace _UIManager
 
             currentPanel = next.panelType;
 
-            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
+            if (fadePanel != null)
+            {
+                fadePanel.blocksRaycasts = false;
+                fadePanel.gameObject.SetActive(false);
+            }
 
             isSwitching = false;
         }
@@ -936,6 +945,11 @@ namespace _UIManager
     [System.Serializable]
     public class Panel
     {
+#if UNITY_EDITOR
+        [SerializeField, HideInInspector] private string name;
+        public void SetName() => name = panelType.ToString();
+#endif
+
         public PanelType panelType;
         public CanvasGroup canvasGroup;
         public GameObject defaultButton;
