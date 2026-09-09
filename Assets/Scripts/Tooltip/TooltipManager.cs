@@ -12,7 +12,7 @@ public sealed class TooltipManager : MonoBehaviour
 
     private void OnTooltipHovered(Tooltip tooltip, bool isHovered)
     {
-        if (titleText == null || descriptionText == null || iconImage == null) return;
+        if (container == null || titleText == null || descriptionText == null || iconImage == null) return;
         if (!isHovered) { container.gameObject.SetActive(false); return; }
 
         titleText.text = tooltip.title;
