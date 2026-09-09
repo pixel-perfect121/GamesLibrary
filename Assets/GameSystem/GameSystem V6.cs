@@ -738,35 +738,40 @@ namespace _AudioManager
 
 namespace _UIManager
 {
-    public enum PanelType { MainMenu, AddGameInfo, GameInfo, }
+    public enum PanelType { MainMenu, GameInfo, AddGameInfo }
 
     public static class UIManager
     {
         private static readonly Dictionary<PanelType, Panel> panelDictionary = new();
 
-        private static PanelType currentPanel;
+        //private static PanelType currentPanel;
         private static bool isSwitching;
 
-        public static void Initialize(PanelType mainMenuPanel)
-        {
-            foreach (var pairs in panelDictionary)
-            {
-                if (pairs.Value == null) continue;
+        //public static void Initialize(PanelType mainMenuPanel)
+        //{
+        //    foreach (var pairs in panelDictionary)
+        //    {
+        //        Panel current = pairs.Value;
+        //        if (current != null && current.canvasGroup.alpha != 0f && current.canvasGroup.gameObject.activeInHierarchy)
+        //            //currentPanel = current.panelType;
+        //        break;
+        //        //if (pairs.Value == null) continue;
+        //        //if (pairs.Value)
 
-                pairs.Value.canvasGroup.alpha = 0f;
-                pairs.Value.canvasGroup.gameObject.SetActive(false);
-            }
+        //        //pairs.Value.canvasGroup.alpha = 0f;
+        //        //pairs.Value.canvasGroup.gameObject.SetActive(false);
+        //    }
 
-            if (!panelDictionary.TryGetValue(mainMenuPanel, out Panel mainMenu)) return;
-
-            mainMenu.canvasGroup.alpha = 1f;
-            mainMenu.canvasGroup.gameObject.SetActive(true);
-            currentPanel = mainMenuPanel;
-        }
+        //    //if (!panelDictionary.TryGetValue(mainMenuPanel, out Panel mainMenu)) return;
+        //    //
+        //    //mainMenu.canvasGroup.alpha = 1f;
+        //    //mainMenu.canvasGroup.gameObject.SetActive(true);
+        //    //currentPanel = mainMenuPanel;
+        //}
 
         public static void Switch(PanelType nextPanel, CanvasGroup fadePanel = null, System.Action OnStart = null, System.Action OnComplete = null)
         {
-            if (!Available(nextPanel, out Panel current, out Panel next)) return;
+            if (!Available(nextPanel, out Panel next)) return;
 
             isSwitching = true;
 
@@ -780,12 +785,12 @@ namespace _UIManager
 
             foreach (var pairs in panelDictionary) pairs.Value?.canvasGroup.gameObject.SetActive(false);
 
-            current.canvasGroup.gameObject.SetActive(false); current.canvasGroup.alpha = 0f;
+            //current.canvasGroup.gameObject.SetActive(false); current.canvasGroup.alpha = 0f;
 
             next.canvasGroup.alpha = 1f; next.canvasGroup.gameObject.SetActive(true);
             if (next.defaultButton != null) OnComplete?.Invoke();
 
-            currentPanel = next.panelType;
+            //currentPanel = next.panelType;
 
             if (fadePanel != null)
             {
@@ -795,119 +800,119 @@ namespace _UIManager
 
             isSwitching = false;
         }
-        public static IEnumerator SwitchFade(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, float holdDuration, System.Action OnStart = null, System.Action OnComplete = null)
-        {
-            if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
+        //public static IEnumerator SwitchFade(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, float holdDuration, System.Action OnStart = null, System.Action OnComplete = null)
+        //{
+        //    if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
 
-            isSwitching = true;
+        //    isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
+        //    fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
 
-            OnStart?.Invoke();
+        //    OnStart?.Invoke();
 
-            float elapsed = 1f;
-            while (elapsed >= 0f)
-            {
-                current.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
-            }
+        //    float elapsed = 1f;
+        //    while (elapsed >= 0f)
+        //    {
+        //        current.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
+        //        elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+        //        yield return null;
+        //    }
 
-            current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
+        //    current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
 
-            yield return new WaitForSeconds(holdDuration != 0f ? holdDuration : 0.001f);
+        //    yield return new WaitForSeconds(holdDuration != 0f ? holdDuration : 0.001f);
 
-            next.canvasGroup.gameObject.SetActive(true);
+        //    next.canvasGroup.gameObject.SetActive(true);
 
-            elapsed = 0;
-            while (elapsed <= 1f)
-            {
-                next.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
-            }
+        //    elapsed = 0;
+        //    while (elapsed <= 1f)
+        //    {
+        //        next.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
+        //        elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+        //        yield return null;
+        //    }
 
-            next.canvasGroup.alpha = 1f;
-            if (next.defaultButton != null) OnComplete?.Invoke();
+        //    next.canvasGroup.alpha = 1f;
+        //    if (next.defaultButton != null) OnComplete?.Invoke();
 
-            currentPanel = next.panelType;
+        //    //currentPanel = next.panelType;
 
-            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
+        //    fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
 
-            isSwitching = false;
-        }
-        public static IEnumerator SwitchCrossfade(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, System.Action OnStart = null, System.Action OnComplete = null)
-        {
-            if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
+        //    isSwitching = false;
+        //}
+        //public static IEnumerator SwitchCrossfade(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, System.Action OnStart = null, System.Action OnComplete = null)
+        //{
+        //    if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
 
-            isSwitching = true;
+        //    isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
+        //    fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
 
-            OnStart?.Invoke();
+        //    OnStart?.Invoke();
 
-            next.canvasGroup.gameObject.SetActive(true); next.canvasGroup.alpha = 0f;
+        //    next.canvasGroup.gameObject.SetActive(true); next.canvasGroup.alpha = 0f;
 
-            float elapsed = 1f;
-            while (elapsed >= 0f)
-            {
-                current.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                next.canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed);
-                elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
-            }
+        //    float elapsed = 1f;
+        //    while (elapsed >= 0f)
+        //    {
+        //        current.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
+        //        next.canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed);
+        //        elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+        //        yield return null;
+        //    }
 
-            current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
+        //    current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
 
-            next.canvasGroup.alpha = 1f;
-            if (next.defaultButton != null) OnComplete?.Invoke();
+        //    next.canvasGroup.alpha = 1f;
+        //    if (next.defaultButton != null) OnComplete?.Invoke();
 
-            currentPanel = next.panelType;
+        //    //currentPanel = next.panelType;
 
-            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
+        //    fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
 
-            isSwitching = false;
-        }
-        public static IEnumerator DipToBlack(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, float holdDuration, System.Action OnStart = null, System.Action OnComplete = null)
-        {
-            if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
+        //    isSwitching = false;
+        //}
+        //public static IEnumerator DipToBlack(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, float holdDuration, System.Action OnStart = null, System.Action OnComplete = null)
+        //{
+        //    if (!Available(nextPanel, out Panel next)) yield break;
 
-            isSwitching = true;
+        //    isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
+        //    fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
 
-            OnStart?.Invoke();
+        //    OnStart?.Invoke();
 
-            float elapsed = 0f;
-            while (elapsed <= 1f)
-            {
-                fadePanel.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
-            }
-            fadePanel.alpha = 1f;
+        //    float elapsed = 0f;
+        //    while (elapsed <= 1f)
+        //    {
+        //        fadePanel.alpha = Mathf.Lerp(0f, 1f, elapsed);
+        //        elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+        //        yield return null;
+        //    }
+        //    fadePanel.alpha = 1f;
 
-            current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
-            next.canvasGroup.gameObject.SetActive(true); next.canvasGroup.alpha = 1f;
+        //    current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
+        //    next.canvasGroup.gameObject.SetActive(true); next.canvasGroup.alpha = 1f;
 
-            yield return new WaitForSeconds(holdDuration != 0f ? holdDuration : 0.001f);
+        //    yield return new WaitForSeconds(holdDuration != 0f ? holdDuration : 0.001f);
 
-            elapsed = 1f;
-            while (elapsed >= 0f)
-            {
-                fadePanel.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
-            }
+        //    elapsed = 1f;
+        //    while (elapsed >= 0f)
+        //    {
+        //        fadePanel.alpha = Mathf.Lerp(0f, 1f, elapsed);
+        //        elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+        //        yield return null;
+        //    }
 
-            if (next.defaultButton != null) OnComplete?.Invoke();
+        //    if (next.defaultButton != null) OnComplete?.Invoke();
 
-            currentPanel = next.panelType;
+        //    //currentPanel = next.panelType;
 
-            fadePanel.alpha = 0f; fadePanel.blocksRaycasts = true; fadePanel.gameObject.SetActive(false);
+        //    fadePanel.alpha = 0f; fadePanel.blocksRaycasts = true; fadePanel.gameObject.SetActive(false);
 
-            isSwitching = false;
-        }
+        //    isSwitching = false;
+        //}
 
         public static Panel GetPanel(PanelType panelType)
         {
@@ -916,14 +921,12 @@ namespace _UIManager
             return panel;
         }
 
-        private static bool Available(PanelType nextPanel, out Panel current, out Panel next)
+        private static bool Available(PanelType nextPanel, out Panel next)
         {
-            current = next = null;
+            next = null;
 
             if (isSwitching) return false;
-            if (!panelDictionary.TryGetValue(currentPanel, out current) || current == null) return false;
             if (!panelDictionary.TryGetValue(nextPanel, out next) || next == null) return false;
-            if (current == next) return false;
 
             return true;
         }
