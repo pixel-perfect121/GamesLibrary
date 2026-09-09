@@ -3,20 +3,12 @@ using UnityEngine.EventSystems;
 
 public sealed class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private Tooltip tooltipSO;
+    [SerializeField] private Tooltip tooltip;
 
     public static event System.Action<Tooltip, bool> Hovered;
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (tooltipSO == null) return;
-
-        Hovered?.Invoke(tooltipSO, true);
-    }
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (tooltipSO == null) return;
-
-        Hovered?.Invoke(tooltipSO, false);
-    }
+    public void OnPointerEnter(PointerEventData eventData) => Hovered?.Invoke(tooltip, true);
+    public void OnPointerExit(PointerEventData eventData) => Hovered?.Invoke(tooltip, false);
 }
+
+[System.Serializable] public struct Tooltip { public string title, description; public Sprite icon; }

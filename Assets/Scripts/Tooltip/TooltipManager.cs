@@ -1,27 +1,37 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using _InputManager;
 
 public sealed class TooltipManager : MonoBehaviour
 {
-    [SerializeField, Header("Container")] private GameObject container;
-
-    [Header("Tooltip requirements")]
-    [SerializeField] private TMPro.TextMeshProUGUI titleText;
-    [SerializeField] private TMPro.TextMeshProUGUI descriptionText;
+    [Header("UI settings"), SerializeField] private RectTransform container;
+    [SerializeField] private TMPro.TextMeshProUGUI titleText, descriptionText;
     [SerializeField] private UnityEngine.UI.Image iconImage;
+
+    [Header("Position settings"), SerializeField] private Vector2 offset;
 
     private void OnTooltipHovered(Tooltip tooltip, bool isHovered)
     {
         if (titleText == null || descriptionText == null || iconImage == null) return;
+        if (!isHovered) { container.gameObject.SetActive(false); return; }
 
         titleText.text = tooltip.title;
         descriptionText.text = tooltip.description;
+        iconImage.sprite = tooltip.icon;
 
-        iconImage.sprite = null;
-        if (tooltip.sprite != null) iconImage.sprite = tooltip.sprite;
-
-        container.SetActive(isHovered);
+        container.gameObject.SetActive(true);
     }
 
-    void OnEnable() { TooltipTrigger.Hovered += OnTooltipHovered; }
-    void OnDisable() { TooltipTrigger.Hovered -= OnTooltipHovered; }
+    private void UpdatePosition(InputAction.CallbackContext context) => container.position = context.ReadValue<Vector2>() + offset;
+
+    void OnEnable()
+    {
+        TooltipTrigger.Hovered += OnTooltipHovered;
+        InputManager.Input.Mouse.Move.performed += UpdatePosition;
+    }
+    void OnDisable()
+    {
+        TooltipTrigger.Hovered -= OnTooltipHovered;
+        InputManager.Input.Mouse.Move.performed -= UpdatePosition;
+    }
 }
