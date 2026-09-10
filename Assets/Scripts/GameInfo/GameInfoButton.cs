@@ -1,13 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
 
 [RequireComponent(typeof(Button))]
-public class GameInfoButton : MonoBehaviour, IPointerClickHandler
+public class GameInfoButton : MonoBehaviour
 {
     private Button button;
-    private TextMeshProUGUI text;
+    private TextMeshProUGUI gameInfoNameText;
 
     private GameInfo gameInfo;
 
@@ -16,14 +15,17 @@ public class GameInfoButton : MonoBehaviour, IPointerClickHandler
     void Awake()
     {
         button = GetComponent<Button>();
-        text = button.GetComponentInChildren<TextMeshProUGUI>();
+        gameInfoNameText = button.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     public void SetupGameInfo(GameInfo gameInfo)
     {
         this.gameInfo = gameInfo;
-        text.text = gameInfo.Title;
+        gameInfoNameText.text = gameInfo.Title;
     }
 
-    public void OnPointerClick(PointerEventData eventData) => Clicked?.Invoke(gameInfo);
+    public void ShowGameInfo() => Clicked?.Invoke(gameInfo);
+
+    void OnEnable() { button.onClick.AddListener(ShowGameInfo); }
+    void OnDisable() { button.onClick.RemoveListener(ShowGameInfo); }
 }
