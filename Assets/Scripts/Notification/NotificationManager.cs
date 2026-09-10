@@ -32,7 +32,7 @@ public sealed class NotificationManager : MonoBehaviour
     {
         isBusy = false;
 
-        if (notificationQueue.Count > 0) Notify(notificationQueue.Dequeue());
+        if (notificationQueue.TryDequeue(out Notification notification)) Notify(notification);
     }
 
     void OnEnable() { Notification.Created += Notify; }
