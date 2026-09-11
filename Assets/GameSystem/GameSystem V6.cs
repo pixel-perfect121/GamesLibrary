@@ -1,3 +1,5 @@
+//using System;
+//using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -16,17 +18,15 @@ namespace _SaveManager
     public static class SaveManager
     {
         public static GameData GameData { get; private set; } = new();
-        private static readonly string path = Path.Combine(Application.persistentDataPath, "Save.json");
 
+        private static readonly string path = Path.Combine(Application.persistentDataPath, "Save.json");
         private static readonly JsonSerializerOptions saveOptions = new()
         {
-            IncludeFields = true,
-            WriteIndented = true,
+            IncludeFields = true, WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             Converters = { new Vector2Converter(), new Vector3Converter(), new ColorConverter() }
         };
-
-        private static readonly System.Threading.SemaphoreSlim saveLock = new(1, 1);
+        private static readonly System.Threading.SemaphoreSlim saveLock = new(1, 2);
 
         private const int ATTEMPTS = 3, DELAY = 15;
 
@@ -39,7 +39,6 @@ namespace _SaveManager
             {
                 case Method.Sync: GlobalSave(); break;
                 case Method.Async: _ = GlobalSaveAsync(); break;
-                default: Debug.LogError("Error while trying to save Game Data"); break;
             }
         }
         public static void RequestLoad(Method loadMethod)
@@ -48,7 +47,6 @@ namespace _SaveManager
             {
                 case Method.Sync: GlobalLoad(); break;
                 case Method.Async: _ = GlobalLoadAsync(); break;
-                default: Debug.LogError("Error while trying to load Game Data"); break;
             }
         }
 
@@ -68,12 +66,7 @@ namespace _SaveManager
                     string json = JsonSerializer.Serialize(GameData, saveOptions);
                     File.WriteAllText(path, json); return;
                 }
-                catch (System.Exception /*message*/)
-                {
-                    Debug.LogError($"Saving failed, trying again: {attempts}");
-
-                    if (attempts >= ATTEMPTS) Debug.Log("All Saving attempts failed, returning defaults");
-                }
+                catch (System.Exception) { }
                 finally { saveLock.Release(); }
             }
             GameData = new();
@@ -95,12 +88,7 @@ namespace _SaveManager
                     GameData = JsonSerializer.Deserialize<GameData>(json, saveOptions) ?? new();
                     return;
                 }
-                catch (System.Exception /*message*/)
-                {
-                    Debug.LogError($"Loading failed, trying again: {attempts}");
-
-                    if (attempts >= ATTEMPTS) Debug.Log("All loading attempts failed, returning defaults");
-                }
+                catch (System.Exception) { }
                 finally { saveLock.Release(); }
             }
             GameData = new(); GlobalSave();
@@ -119,14 +107,7 @@ namespace _SaveManager
                     string json = JsonSerializer.Serialize(GameData, saveOptions);
                     await File.WriteAllTextAsync(path, json); return;
                 }
-                catch (System.Exception /*message*/)
-                {
-                    Debug.LogError($"Saving failed, trying again: {attempts}");
-
-                    if (attempts >= ATTEMPTS) Debug.Log("All Saving attempts failed, returning defaults");
-
-                    await Task.Delay(DELAY);
-                }
+                catch (System.Exception) { await Task.Delay(DELAY); }
                 finally { saveLock.Release(); }
             }
             GameData = new();
@@ -148,14 +129,7 @@ namespace _SaveManager
                     GameData = JsonSerializer.Deserialize<GameData>(json, saveOptions) ?? new();
                     return;
                 }
-                catch (System.Exception /*message*/)
-                {
-                    Debug.LogError($"Loading failed, trying again: {attempts}");
-
-                    if (attempts >= ATTEMPTS) Debug.Log("All loading attempts failed, returning defaults");
-
-                    await Task.Delay(DELAY);
-                }
+                catch (System.Exception) { await Task.Delay(DELAY); }
                 finally { saveLock.Release(); }
             }
             GameData = new(); await GlobalSaveAsync(); return;
@@ -280,25 +254,27 @@ namespace _SaveManager
     [System.Serializable]
     public class GameData
     {
-        
+
     }
     #endregion
 }
 
 namespace _InputManager
 {
-    public enum GameMap { }
+    public enum GameMap { Player, UI }
     public enum Condition { Up, Down, Held }
+    public enum Modification { Enable, Disable }
 
     public static class InputManager
     {
         public static GameControls Input { get; private set; } = new();
         public static InputActionAsset Asset => Input.asset;
+        private static readonly Dictionary<GameMap, InputActionMap> mapsDictionary = new();
 
-        public static Keyboard Keyboard { get; private set; } = Keyboard.current;
-        public static Mouse Mouse { get; private set; } = Mouse.current;
-        public static Gamepad Gamepad { get; private set; } = Gamepad.current;
-        public static Joystick Joystick { get; private set; } = Joystick.current;
+        public static Keyboard Keyboard { get; private set; }
+        public static Mouse Mouse { get; private set; }
+        public static Gamepad Gamepad { get; private set; }
+        public static Joystick Joystick { get; private set; }
         private static InputActionRebindingExtensions.RebindingOperation operation = new();
 
         public static KeyModifiers Modifiers { get; private set; } = new();
@@ -309,66 +285,50 @@ namespace _InputManager
         private static void Initialize()
         {
             Input.Enable(); Asset.Enable();
+            mapsDictionary.Add(GameMap.Player, Input.Player);
+            mapsDictionary.Add(GameMap.UI, Input.UI);
 
+            Keyboard = Keyboard.current; Mouse = Mouse.current; Gamepad = Gamepad.current; Joystick = Joystick.current;
             LoadKeybinds();
-
-            InputSystem.onDeviceChange += DetectDevice;
-            static void DetectDevice(InputDevice device, InputDeviceChange change)
-            {
-                foreach (InputDevice dv in InputSystem.devices)
-                { if (dv == null) Debug.Log("No device detected, please connect a device."); }
-
-                if (device is Keyboard ckb)
-                {
-                    switch (change)
-                    {
-                        case InputDeviceChange.Added: Keyboard = ckb; break;
-                        case InputDeviceChange.Removed: Keyboard = null; break;
-                        case InputDeviceChange.Reconnected: Keyboard = ckb; break;
-                        case InputDeviceChange.Disconnected: Keyboard = null; break;
-                    }
-                }
-                if (device is Mouse cms)
-                {
-                    switch (change)
-                    {
-                        case InputDeviceChange.Added: Mouse = cms; break;
-                        case InputDeviceChange.Removed: Mouse = null; break;
-                        case InputDeviceChange.Reconnected: Mouse = cms; break;
-                        case InputDeviceChange.Disconnected: Mouse = null; break;
-                    }
-                }
-                if (device is Gamepad cgp)
-                {
-                    switch (change)
-                    {
-                        case InputDeviceChange.Added: Gamepad = cgp; break;
-                        case InputDeviceChange.Removed: Gamepad = null; break;
-                        case InputDeviceChange.Reconnected: Gamepad = cgp; break;
-                        case InputDeviceChange.Disconnected: Gamepad = null; break;
-                    }
-                }
-                if (device is Joystick cjs)
-                {
-                    switch (change)
-                    {
-                        case InputDeviceChange.Added: Joystick = cjs; break;
-                        case InputDeviceChange.Removed: Joystick = null; break;
-                        case InputDeviceChange.Reconnected: Joystick = cjs; break;
-                        case InputDeviceChange.Disconnected: Joystick = null; break;
-                    }
-                }
-            }
         }
 
         #region Map settings
-        public static void EnableMap(GameMap map) { Asset.FindActionMap(map.ToString()).Enable(); }
-        public static void DisableMap(GameMap map) { Asset.FindActionMap(map.ToString()).Disable(); }
-        public static void EnableOnly(GameMap map) { DisableAll(); EnableMap(map); }
-        public static void DisableOnly(GameMap map) { EnableAll(); DisableMap(map); }
-        public static void EnableAll() { foreach (InputActionMap map in Asset.actionMaps) map.Enable(); }
-        public static void DisableAll() { foreach (InputActionMap map in Asset.actionMaps) map.Disable(); }
-        public static bool IsItOn(GameMap map) { return Asset.FindActionMap(map.ToString()).enabled; }
+        public static void ModifyMap(GameMap map, Modification modification)
+        {
+            if (!mapsDictionary.TryGetValue(map, out InputActionMap actionMap)) return;
+
+            switch (modification)
+            {
+                case Modification.Enable: actionMap.Enable(); break;
+                case Modification.Disable: actionMap.Disable(); break;
+            }
+        }
+        public static void ModifyOnly(GameMap map, Modification modification)
+        {
+            if (!mapsDictionary.TryGetValue(map, out InputActionMap actionMap)) return;
+
+            switch (modification)
+            {
+                case Modification.Enable: ModifyAll(Modification.Disable); actionMap.Enable(); break;
+                case Modification.Disable: ModifyAll(Modification.Enable); actionMap.Disable(); break;
+            }
+        }
+        public static void ModifyAll(Modification modification)
+        {
+            foreach (var pairs in mapsDictionary)
+            {
+                if (pairs.Value == null) continue;
+
+                if (modification == Modification.Enable) pairs.Value.Enable();
+                else pairs.Value.Disable();
+            }
+        }
+        public static bool MapEnabled(GameMap map)
+        {
+            if (!mapsDictionary.TryGetValue(map, out InputActionMap actionMap)) return false;
+
+            return actionMap.enabled;
+        }
         #endregion
 
         #region Get functions
@@ -548,14 +508,9 @@ namespace _InputManager
 
             operation = action.PerformInteractiveRebinding(index).WithControlsExcluding(includeMouse ? " " : "Mouse")
                 .WithCancelingThrough("<Keyboard>/escape")
-                .WithTimeout(5f)
-                .OnComplete(op =>
-                {
-                    action.Enable(); op.Dispose();
-                    SaveKeybinds(); OnComplete?.Invoke();
-                })
-                .OnCancel(op => { action.Enable(); op.Dispose(); OnComplete?.Invoke(); })
-                .Start();
+                .WithTimeout(5f).OnComplete(op => { CleanUp(op); SaveKeybinds(); }).OnCancel(op => CleanUp(op)).Start();
+
+            void CleanUp(InputActionRebindingExtensions.RebindingOperation op) { action.Enable(); op.Dispose(); OnComplete?.Invoke(); }
         }
 
         public static InputAction FindAction(InputActionReference actionRef) { return Input.FindAction(actionRef.name); }
@@ -571,14 +526,14 @@ namespace _InputManager
 
         public struct KeyModifiers
         {
-            public bool LeftControl => GetKeyboardKey(Key.LeftCtrl, Condition.Held);
-            public bool RightControl => GetKeyboardKey(Key.RightCtrl, Condition.Held);
+            public readonly bool LeftControl => GetKeyboardKey(Key.LeftCtrl, Condition.Held);
+            public readonly bool RightControl => GetKeyboardKey(Key.RightCtrl, Condition.Held);
 
-            public bool LeftShift => GetKeyboardKey(Key.LeftShift, Condition.Held);
-            public bool RightShift => GetKeyboardKey(Key.RightShift, Condition.Held);
+            public readonly bool LeftShift => GetKeyboardKey(Key.LeftShift, Condition.Held);
+            public readonly bool RightShift => GetKeyboardKey(Key.RightShift, Condition.Held);
 
-            public bool LeftAlt => GetKeyboardKey(Key.LeftAlt, Condition.Held);
-            public bool RightAlt => GetKeyboardKey(Key.RightAlt, Condition.Held);
+            public readonly bool LeftAlt => GetKeyboardKey(Key.LeftAlt, Condition.Held);
+            public readonly bool RightAlt => GetKeyboardKey(Key.RightAlt, Condition.Held);
         }
     }
 }
@@ -637,22 +592,18 @@ namespace _AudioManager
         }
         public static IEnumerator StopMusic(AudioSource musicSource)
         {
-            if (isSwitching) yield break;
+            if (isSwitching || !musicSource.isPlaying) yield break;
 
             isSwitching = true;
 
-            float elapsed = 0;
-            if (musicSource.isPlaying)
+            float elapsed = 0, currentVolume = musicSource.volume;
+            while (elapsed <= 1f)
             {
-                float currentVolume = musicSource.volume;
-                while (elapsed <= 1f)
-                {
-                    musicSource.volume = Mathf.Lerp(currentVolume, 0f, elapsed);
-                    elapsed += Time.deltaTime;
-                    yield return null;
-                }
-                musicSource.volume = 0f; musicSource.Stop();
+                musicSource.volume = Mathf.Lerp(currentVolume, 0f, elapsed);
+                elapsed += Time.deltaTime;
+                yield return null;
             }
+            musicSource.volume = 0f; musicSource.Stop();
 
             isSwitching = false;
         }
@@ -684,34 +635,6 @@ namespace _AudioManager
             return true;
         }
 
-        #region Get&Set volume
-        //public static void SetMasterVolume(float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(MASTERVOLUME, Mathf.Log10(audioLevel) * 20f);
-        //}
-        //public static void SetMusicVolume(float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(MUSICVOLUME, Mathf.Log10(audioLevel) * 20f);
-        //}
-        //public static void SetSFXVolume(float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(SFXVOLUME, Mathf.Log10(audioLevel) * 20f);
-        //}
-
-        //public static void SetVolume(string mixerName, float audioLevel)
-        //{
-        //    if (AudioMixer == null) return;
-
-        //    AudioMixer.SetFloat(mixerName, Mathf.Log10(audioLevel) * 20f);
-        //}
-        #endregion
-
         public static void Register(AudioBook book)
         {
             if (audioDictionary.ContainsKey(book.soundType)) return;
@@ -739,72 +662,63 @@ namespace _AudioManager
 
 namespace _UIManager
 {
-    public enum PanelType { }
+    public enum PanelType { MainMenu, Settings, }
 
     public static class UIManager
     {
         private static readonly Dictionary<PanelType, Panel> panelDictionary = new();
 
-        private static PanelType currentPanel;
         private static bool isSwitching;
 
-        public static void Initialize(PanelType mainMenuPanel)
+        public static void Switch(PanelType currentPanel, PanelType nextPanel, CanvasGroup fadePanel = null, System.Action OnStart = null, System.Action OnComplete = null)
         {
-            foreach (var pairs in panelDictionary)
-            {
-                if (pairs.Value == null) continue;
-
-                pairs.Value.canvasGroup.alpha = 0f;
-                pairs.Value.canvasGroup.gameObject.SetActive(false);
-            }
-
-            if (!panelDictionary.TryGetValue(mainMenuPanel, out Panel mainMenu)) return;
-
-            mainMenu.canvasGroup.alpha = 1f;
-            mainMenu.canvasGroup.gameObject.SetActive(true);
-            currentPanel = mainMenuPanel;
-        }
-
-        public static void Switch(PanelType nextPanel, CanvasGroup fadePanel, System.Action OnStart = null, System.Action OnComplete = null)
-        {
-            if (!Available(nextPanel, out Panel current, out Panel next)) return;
+            if (!Available(currentPanel, nextPanel, out Panel current, out Panel next)) return;
 
             isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
             OnStart?.Invoke();
+
+            if (fadePanel != null)
+            {
+                fadePanel.gameObject.SetActive(true);
+                fadePanel.blocksRaycasts = true;
+            }
 
             foreach (var pairs in panelDictionary) pairs.Value?.canvasGroup.gameObject.SetActive(false);
 
-            current.canvasGroup.gameObject.SetActive(false); current.canvasGroup.alpha = 0f;
-
             next.canvasGroup.alpha = 1f; next.canvasGroup.gameObject.SetActive(true);
-            if (next.defaultButton != null) OnComplete?.Invoke();
 
-            currentPanel = next.panelType;
+            if (fadePanel != null)
+            {
+                fadePanel.blocksRaycasts = false;
+                fadePanel.gameObject.SetActive(false);
+            }
 
-            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
+            OnComplete?.Invoke();
 
             isSwitching = false;
         }
-        public static IEnumerator SwitchFade(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, float holdDuration, System.Action OnStart = null, System.Action OnComplete = null)
+        public static IEnumerator SwitchFade(PanelType currentPanel, PanelType nextPanel, float fadeDuration, float holdDuration, CanvasGroup fadePanel = null, System.Action OnStart = null, System.Action OnComplete = null)
         {
-            if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
+            if (!Available(currentPanel, nextPanel, out Panel current, out Panel next)) yield break;
 
             isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
-
             OnStart?.Invoke();
 
-            float elapsed = 1f;
-            while (elapsed >= 0f)
+            if (fadePanel != null)
             {
-                current.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
+                fadePanel.gameObject.SetActive(true);
+                fadePanel.blocksRaycasts = true;
             }
 
+            float elapsed = 0;
+            while (elapsed <= 1f)
+            {
+                current.canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed);
+                elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+                yield return null;
+            }
             current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
 
             yield return new WaitForSeconds(holdDuration != 0f ? holdDuration : 0.001f);
@@ -818,57 +732,63 @@ namespace _UIManager
                 elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
                 yield return null;
             }
-
             next.canvasGroup.alpha = 1f;
-            if (next.defaultButton != null) OnComplete?.Invoke();
 
-            currentPanel = next.panelType;
-
-            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
-
-            isSwitching = false;
-        }
-        public static IEnumerator SwitchCrossfade(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, System.Action OnStart = null, System.Action OnComplete = null)
-        {
-            if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
-
-            isSwitching = true;
-
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
-
-            OnStart?.Invoke();
-
-            next.canvasGroup.gameObject.SetActive(true); next.canvasGroup.alpha = 0f;
-
-            float elapsed = 1f;
-            while (elapsed >= 0f)
+            if (fadePanel != null)
             {
-                current.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
-                next.canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed);
-                elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
-                yield return null;
+                fadePanel.blocksRaycasts = false;
+                fadePanel.gameObject.SetActive(false);
             }
 
-            current.canvasGroup.alpha = 0f; current.canvasGroup.gameObject.SetActive(false);
-
-            next.canvasGroup.alpha = 1f;
-            if (next.defaultButton != null) OnComplete?.Invoke();
-
-            currentPanel = next.panelType;
-
-            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
+            OnComplete?.Invoke();
 
             isSwitching = false;
         }
-        public static IEnumerator DipToBlack(PanelType nextPanel, CanvasGroup fadePanel, float fadeDuration, float holdDuration, System.Action OnStart = null, System.Action OnComplete = null)
+        public static IEnumerator SwitchCrossfade(PanelType currentPanel, PanelType nextPanel, float fadeDuration, CanvasGroup fadePanel = null, System.Action OnStart = null, System.Action OnComplete = null)
         {
-            if (!Available(nextPanel, out Panel current, out Panel next)) yield break;
+            if (!Available(currentPanel, nextPanel, out Panel current, out Panel next)) yield break;
 
             isSwitching = true;
 
-            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
+            OnStart?.Invoke();
+
+            if (fadePanel != null)
+            {
+                fadePanel.gameObject.SetActive(true);
+                fadePanel.blocksRaycasts = true;
+            }
+
+            next.canvasGroup.gameObject.SetActive(true);
+
+            float elapsed = 0f;
+            while (elapsed <= 1f)
+            {
+                current.canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed);
+                next.canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed);
+                elapsed += Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
+                yield return null;
+            }
+            next.canvasGroup.alpha = 1f;
+
+            if (fadePanel != null)
+            {
+                fadePanel.blocksRaycasts = false;
+                fadePanel.gameObject.SetActive(false);
+            }
+
+            OnComplete?.Invoke();
+
+            isSwitching = false;
+        }
+        public static IEnumerator DipToColor(PanelType currentPanel, PanelType nextPanel,float fadeDuration, float holdDuration,  CanvasGroup fadePanel, System.Action OnStart = null, System.Action OnComplete = null)
+        {
+            if (!Available(currentPanel, nextPanel, out Panel current, out Panel next)) yield break;
+
+            isSwitching = true;
 
             OnStart?.Invoke();
+
+            fadePanel.gameObject.SetActive(true); fadePanel.blocksRaycasts = true;
 
             float elapsed = 0f;
             while (elapsed <= 1f)
@@ -891,12 +811,10 @@ namespace _UIManager
                 elapsed -= Time.deltaTime / (fadeDuration != 0f ? fadeDuration : 0.001f);
                 yield return null;
             }
+            fadePanel.alpha = 0f;
+            fadePanel.blocksRaycasts = false; fadePanel.gameObject.SetActive(false);
 
-            if (next.defaultButton != null) OnComplete?.Invoke();
-
-            currentPanel = next.panelType;
-
-            fadePanel.alpha = 0f; fadePanel.blocksRaycasts = true; fadePanel.gameObject.SetActive(false);
+            OnComplete?.Invoke();
 
             isSwitching = false;
         }
@@ -907,15 +825,14 @@ namespace _UIManager
 
             return panel;
         }
-
-        private static bool Available(PanelType nextPanel, out Panel current, out Panel next)
+        private static bool Available(PanelType currentPanel, PanelType nextPanel, out Panel current, out Panel next)
         {
             current = next = null;
 
             if (isSwitching) return false;
             if (!panelDictionary.TryGetValue(currentPanel, out current) || current == null) return false;
             if (!panelDictionary.TryGetValue(nextPanel, out next) || next == null) return false;
-            if (current == next) return false;
+            //if (current == null) return false;
 
             return true;
         }
@@ -961,8 +878,8 @@ namespace _Inheritance
 
     public class StateMachine<T>
     {
-        public State<T> CurrentState { get; private set; }
         public T Owner { get; private set; }
+        public State<T> CurrentState { get; private set; }
 
         public StateMachine(T owner) => Owner = owner;
 
@@ -978,16 +895,93 @@ namespace _Inheritance
     #region Abstracts
     public abstract class State<T>
     {
-        protected StateMachine<T> StateMachine { get; private set; }
-        protected T Owner => StateMachine.Owner;
+        protected StateMachine<T> stateMachine;
+        protected T Owner => stateMachine.Owner;
 
-        public State(StateMachine<T> stateMachine) => StateMachine = stateMachine;
+        public State(StateMachine<T> stateMachine) => this.stateMachine = stateMachine;
 
         public abstract void Enter();
-		public virtual void Process() { }
-		public virtual void LateProcess() { }
-		public virtual void FixedProcess() { }
+        public virtual void Process() { }
+        public virtual void LateProcess() { }
+        public virtual void FixedProcess() { }
         public abstract void Exit();
     }
     #endregion
+
+    #region Interfaces
+    public interface IDamageable
+    {
+        public int MaxHealth { get; set; } // Make a private field for current health
+
+        public void TakeDamage(int amount);
+        public void Die();
+    }
+
+    public interface IInteractable { public void Interact(); }
+
+    public interface IUpdateable { public void Process(float deltaTime); }
+    public interface ILateUpdateable { public void LateProcess(float deltaTime); }
+    public interface IFixedUpdateable { public void FixedProcess(float fixedDeltaTime); }
+    #endregion
+}
+
+namespace _ObjectPool
+{
+    public enum PoolType { }
+
+    public static class ObjectPool
+    {
+        private static readonly Dictionary<PoolType, Pool> poolDictionary = new();
+
+        public static void Initialize(Transform parent)
+        {
+            foreach (Pool pool in poolDictionary.Values)
+            {
+                for (int i = 0; i < pool.size; i++)
+                {
+                    if (pool.prefab == null) return;
+
+                    GameObject spawnedObject = GameObject.Instantiate(pool.prefab, parent != null ? parent : null);
+
+                    pool.queue.Enqueue(spawnedObject);
+                    spawnedObject.SetActive(false);
+                }
+            }
+        }
+
+        public static GameObject SpawnObject(PoolType poolType, Vector3 position, Quaternion rotation)
+        {
+            if (!poolDictionary.TryGetValue(poolType, out Pool pool)) return null;
+
+            GameObject objectToSpawn = pool.queue.Dequeue();
+            objectToSpawn.transform.SetPositionAndRotation(position, rotation);
+            objectToSpawn.SetActive(false); objectToSpawn.SetActive(true);
+
+            pool.queue.Enqueue(objectToSpawn);
+            return objectToSpawn;
+        }
+
+        public static void Register(Pool pool)
+        {
+            if (poolDictionary.ContainsKey(pool.poolType)) return;
+
+            poolDictionary.Add(pool.poolType, pool);
+        }
+        public static void Unregister(Pool pool)
+        {
+            if (!poolDictionary.ContainsKey(pool.poolType)) return;
+
+            poolDictionary.Remove(pool.poolType);
+        }
+    }
+
+    [System.Serializable]
+    public class Pool
+    {
+        public PoolType poolType;
+        public GameObject prefab;
+        [Range(0, 500)] public int size;
+
+        public Queue<GameObject> queue = new();
+    }
 }

@@ -1,0 +1,16 @@
+{
+    "name": "Assembly-UILogic",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8301ee766821bf246ae6d117e92f39a0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
