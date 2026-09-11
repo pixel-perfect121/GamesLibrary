@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>Notifications across the game, useful for sending FIX BEDROCK MOJANG 🗿🗿🗿.</summary>
-public struct Notification
+public readonly struct Notification
 {
     /// <summary>Subject's title or name of sender.</summary>
     public readonly string title;
@@ -9,8 +9,6 @@ public struct Notification
     public readonly string description;
     /// <summary>Time at which this object was created.</summary>
     public readonly DateTime creationTime;
-    /// <summary>Time at which this object was delivered.</summary>
-    public DateTime DeliveryTime { get; private set; }
 
     /// <summary>Automatically invoked when creating new notification object.</summary>
     public static event Action<Notification> Created;
@@ -21,10 +19,6 @@ public struct Notification
     public Notification(string title, string message)
     {
         this.title = title; this.description = message;
-        creationTime = DateTime.UtcNow; DeliveryTime = new();
-
-        Created?.Invoke(this);
+        creationTime = DateTime.UtcNow; Created?.Invoke(this);
     }
-
-    public void SetDeliveryTime(DateTime deliveryTime) => DeliveryTime = deliveryTime;
 }

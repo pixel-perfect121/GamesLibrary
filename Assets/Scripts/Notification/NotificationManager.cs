@@ -18,11 +18,9 @@ public sealed class NotificationManager : MonoBehaviour
 
         isBusy = true;
 
-        notification.SetDeliveryTime(System.DateTime.UtcNow);
-
         titleText.text = notification.title;
         descriptionText.text = notification.description;
-        deliveryTimeText.text = notification.DeliveryTime.ToString("hh:mm(tt)");
+        deliveryTimeText.text = $"Received at {System.DateTime.UtcNow:"hh:mm(tt)}";
 
         animator.ResetTrigger(AnimateHash);
         animator.SetTrigger(AnimateHash);
